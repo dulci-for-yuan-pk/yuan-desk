@@ -1,0 +1,9 @@
+{
+  "name": "yuan-desk",
+  "private": true,
+  "type": "module",
+  "version": "3.0.0",
+  "description": "Yuan Desk — agent operations desk, account books and DULCi console for Mirza Javaid Iqbal",
+  "engines": { "node": ">=20" },
+  "scripts": { "build": "node scripts/make-icons.mjs" }
+}

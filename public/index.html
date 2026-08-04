@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Yuan Desk</title>
+<meta name="description" content="Yuan Desk — business cockpit and DULCi console">
+<meta name="theme-color" content="#04101A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4EDE1" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Yuan Desk">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/app.css?v=23a7798c">
+</head>
+<body data-mode="simple">
+
+<canvas id="amb"></canvas>
+<div class="grain"></div>
+
+<!-- ============================ LOCK ============================ -->
+<div id="lock" class="lock">
+  <div class="lock-inner">
+    <div class="brand"><span class="brand-dot"></span>Yuan <b>Desk</b></div>
+    <p class="lock-hint" data-t="lockHint">اپنا چار ہندسوں کا پن لکھیں</p>
+    <div class="pin-dots" id="pinDots"></div>
+    <div id="pinErr" class="pin-err"></div>
+    <div class="keypad" id="keypad"></div>
+  </div>
+</div>
+
+<!-- ============================ APP ============================ -->
+<div id="app" class="app" hidden>
+
+  <header class="topbar">
+    <button class="icon-btn" id="backBtn" hidden aria-label="Back">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="topbar-title" id="topTitle">Yuan Desk</div>
+    <div class="topbar-right">
+      <span class="sync-pill" id="syncPill" hidden></span>
+      <span class="conn" id="conn" title="DULCi"><i></i></span>
+      <button class="icon-btn" id="themeBtn" aria-label="Theme"></button>
+      <button class="icon-btn" id="langBtn" aria-label="Language">A</button>
+      <button class="icon-btn" id="modeBtn" aria-label="Mode">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ---------------- HOME ---------------- -->
+    <section class="view" data-view="home">
+      <div class="hero-greet">
+        <div class="greet-line" id="greetLine">السلام علیکم</div>
+        <div class="greet-sub" data-t="greetSub">مرزا جاوید اقبال صاحب</div>
+        <div class="greet-date num" id="greetDate"></div>
+      </div>
+
+      <div class="mic-wrap">
+        <button class="mic-big" id="micBig">
+          <span class="mic-ring"></span>
+          <svg viewBox="0 0 24 24" class="mic-ico"><path d="M12 15a4 4 0 004-4V7a4 4 0 00-8 0v4a4 4 0 004 4z"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>
+          <span class="mic-label" data-t="micLabel">بات کریں</span>
+        </button>
+        <div class="wave" id="wave" hidden></div>
+      </div>
+      <p class="mic-note" data-t="micNote">دبا کر رکھیں اور بولیں</p>
+
+      <div class="glance" id="glance"></div>
+      <div class="tiles" id="homeTiles"></div>
+    </section>
+
+    <!-- ---------------- TALK ---------------- -->
+    <section class="view" data-view="talk">
+      <div class="chat" id="chat"></div>
+      <div class="composer">
+        <button class="icon-btn round" id="attachBtn" aria-label="Photo">
+          <svg viewBox="0 0 24 24"><path d="M4 16l4.5-4.5a2 2 0 013 0L16 16M14 14l1.5-1.5a2 2 0 013 0L21 15"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>
+        </button>
+        <input type="file" id="fileIn" accept="image/*" hidden>
+        <textarea id="msgIn" rows="1" placeholder="لکھیں…" data-tph="composerPh"></textarea>
+        <button class="icon-btn round mic-sm" id="micSm" aria-label="Voice">
+          <svg viewBox="0 0 24 24"><path d="M12 15a4 4 0 004-4V7a4 4 0 00-8 0v4a4 4 0 004 4z"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>
+        </button>
+        <button class="send" id="sendBtn" aria-label="Send">
+          <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 8 6 8z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------------- AGENT SCREEN ---------------- -->
+    <section class="view" data-view="screen">
+      <div class="screen-empty" id="screenEmpty">
+        <div class="se-ico"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+        <h3 data-t="screenEmptyT">ابھی کوئی اسکرین نہیں</h3>
+        <p data-t="screenEmptyS">جب DULCi کو کسی ویب سائٹ پر لاگ اِن کرنا ہوگا، وہ اپنی اسکرین یہاں بھیج دے گا۔ آپ اپنا پاس ورڈ خود لکھیں گے۔</p>
+      </div>
+      <div class="screen-live" id="screenLive" hidden>
+        <div class="screen-instruct">
+          <div class="si-badge" data-t="siBadge">DULCi کی درخواست</div>
+          <div class="si-text" id="siText"></div>
+        </div>
+        <div class="screen-frame">
+          <iframe id="liveFrame" title="Agent browser" allow="clipboard-read; clipboard-write"></iframe>
+          <div class="frame-fallback" id="frameFallback" hidden>
+            <p data-t="frameFallbackT">اسکرین یہاں نہیں کھل سکی۔</p>
+            <a class="btn btn-primary" id="openTab" target="_blank" rel="noopener noreferrer" data-t="openTab">نئی ونڈو میں کھولیں</a>
+          </div>
+        </div>
+        <div class="screen-actions">
+          <button class="btn btn-ghost" id="screenCancel" data-t="screenCancel">منسوخ</button>
+          <button class="btn btn-primary" id="screenDone" data-t="screenDone">میں نے کر لیا</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------- DASHBOARD ---------------- -->
+    <section class="view" data-view="dash">
+      <div class="list-head"><h2 data-t="navDash">کاروبار کی حالت</h2>
+        <button class="btn btn-sm btn-ghost" id="dashRefresh" data-t="refresh">تازہ</button></div>
+      <div class="kpis" id="dashKpis"></div>
+      <div class="kpi" id="dashChart"></div>
+      <div id="dashLists"></div>
+    </section>
+
+    <!-- ---------------- KHATA (party ledger) ---------------- -->
+    <section class="view" data-view="khata">
+      <div class="list-head"><h2 data-t="navKhata">کھاتہ</h2>
+        <button class="btn btn-sm btn-primary" data-new="payments" data-t="addPay">رقم درج کریں</button></div>
+      <div class="seg" id="khataSeg"></div>
+      <div id="khataBody"></div>
+    </section>
+
+    <!-- ---------------- CASH BOOK ---------------- -->
+    <section class="view" data-view="cashbook">
+      <div class="list-head"><h2 data-t="navCash">روزنامچہ</h2>
+        <button class="btn btn-sm btn-primary" data-new="ledger" data-t="addNew">نیا</button></div>
+      <div id="cashBody"></div>
+    </section>
+
+    <!-- ---------------- STOCK ---------------- -->
+    <section class="view" data-view="stock">
+      <div class="list-head"><h2 data-t="navStock">اسٹاک</h2>
+        <button class="btn btn-sm btn-primary" data-new="stock" data-t="addNew">نیا</button></div>
+      <div class="kpis" id="stockKpis"></div>
+      <div class="cards" id="list-stock"></div>
+    </section>
+
+    <!-- ---------------- LANDED COST ---------------- -->
+    <section class="view" data-view="landed">
+      <h2 data-t="navLanded">لاگت کا حساب</h2>
+      <p class="hintline" data-t="landedHint">یوآن سے روپے تک — فی پیس اصل لاگت۔</p>
+      <div id="landedForm"></div>
+      <div id="landedOut"></div>
+    </section>
+
+    <!-- ---------------- WORK (operations desk) ---------------- -->
+    <section class="view" data-view="ops">
+      <div class="list-head"><h2 data-t="navOps">کام</h2>
+        <button class="btn btn-sm btn-ghost" id="opsRefresh" data-t="refresh">تازہ</button></div>
+      <div id="opsBody"></div>
+    </section>
+
+    <!-- ---------------- INTERPRETER ---------------- -->
+    <section class="view" data-view="interpret">
+      <h2 data-t="navInterpret">ترجمان</h2>
+      <div id="interpBody"></div>
+    </section>
+
+    <!-- ---------------- SOURCING PLAN ---------------- -->
+    <section class="view" data-view="plan">
+      <h2 data-t="navPlan">خریداری کا منصوبہ</h2>
+      <div id="planBody"></div>
+    </section>
+
+    <!-- ---------------- SIMPLE LISTS ---------------- -->
+    <section class="view" data-view="orders"><div class="list-head"><h2 data-t="navOrders">آرڈر</h2><button class="btn btn-sm btn-primary" data-new="orders" data-t="addNew">نیا</button></div><div class="cards" id="list-orders"></div></section>
+    <section class="view" data-view="invoices"><div class="list-head"><h2 data-t="navInvoices">انوائس</h2><button class="btn btn-sm btn-primary" data-new="invoices" data-t="addNew">نیا</button></div><div class="cards" id="list-invoices"></div></section>
+    <section class="view" data-view="customers"><div class="list-head"><h2 data-t="navCustomers">گاہک</h2><button class="btn btn-sm btn-primary" data-new="customers" data-t="addNew">نیا</button></div><div class="cards" id="list-customers"></div></section>
+    <section class="view" data-view="suppliers"><div class="list-head"><h2 data-t="navSuppliers">سپلائر</h2><button class="btn btn-sm btn-primary" data-new="suppliers" data-t="addNew">نیا</button></div><div class="cards" id="list-suppliers"></div></section>
+    <section class="view" data-view="shipments"><div class="list-head"><h2 data-t="navShipments">شپمنٹ</h2><button class="btn btn-sm btn-primary" data-new="shipments" data-t="addNew">نیا</button></div><div class="cards" id="list-shipments"></div></section>
+    <section class="view" data-view="trips"><div class="list-head"><h2 data-t="navTrips">سفر</h2><button class="btn btn-sm btn-primary" data-new="trips" data-t="addNew">نیا</button></div><div class="cards" id="list-trips"></div></section>
+    <section class="view" data-view="content"><div class="list-head"><h2 data-t="navContent">ویڈیو و پوسٹ</h2></div><div class="cards" id="list-content"></div></section>
+
+    <!-- ---------------- MORE ---------------- -->
+    <section class="view" data-view="more">
+      <h2 data-t="navMore">مزید</h2>
+      <div class="tiles" id="moreTiles" style="margin-top:1rem"></div>
+      <div class="settings">
+        <div class="set-row"><span data-t="setMode">اسکرین کی قسم</span><button class="btn btn-sm btn-ghost" id="setModeBtn"></button></div>
+        <div class="set-row"><span data-t="setTheme">دن یا رات</span><button class="btn btn-sm btn-ghost" id="setThemeBtn"></button></div>
+        <div class="set-row"><span data-t="setLang">زبان</span><button class="btn btn-sm btn-ghost" id="setLangBtn"></button></div>
+        <div class="set-row" id="demoRow" hidden><span data-t="setDemo">نمونہ ڈیٹا</span><button class="btn btn-sm btn-ghost" id="clearDemoBtn" data-t="clearDemo">ہٹا دیں</button></div>
+        <div class="set-row"><span data-t="setBackup">بیک اپ</span><button class="btn btn-sm btn-ghost" id="backupBtn" data-t="download">محفوظ کریں</button></div>
+        <div class="set-row"><span data-t="setLogout">باہر نکلیں</span><button class="btn btn-sm btn-ghost" id="logoutBtn" data-t="logout">لاگ آؤٹ</button></div>
+        <div class="set-meta" id="setMeta"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+</div>
+
+<!-- ============================ SHEET ============================ -->
+<div class="sheet-wrap" id="sheetWrap" hidden>
+  <div class="sheet-back" id="sheetBack"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head"><h3 id="sheetTitle"></h3>
+      <button class="icon-btn" id="sheetClose" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sheet-body" id="sheetBody"></div>
+    <div class="sheet-foot" id="sheetFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/ui.js?v=0f88a781"></script>
+<script src="/js/books.js?v=524ab4ef"></script>
+<script src="/js/app.js?v=0dd9e9f4"></script>
+<script src="/js/ops.js?v=44cf9234"></script>
+</body>
+</html>
