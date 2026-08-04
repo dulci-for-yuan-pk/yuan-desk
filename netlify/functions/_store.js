@@ -124,6 +124,48 @@ const TABLE = {
 };
 
 /* ============================================================
+   Vocabulary guard.
+
+   The database constrains status words, and a raw constraint failure tells a
+   caller nothing useful — DULCi once blamed the phone field and silently
+   downgraded a real order to a note. So: accept the obvious synonyms, and when
+   a word genuinely is not allowed, say which column and list the choices.
+   ============================================================ */
+const ENUMS = {
+  orders:    { status: ['new','quoted','approved','shipped','done','cancelled'] },
+  shipments: { status: ['planned','booked','sailing','port','cleared','delivered'] },
+  trips:     { status: ['planning','booked','travelling','done'] },
+  content:   { status: ['draft','ready','scheduled','published'] },
+  payments:  { dir: ['in','out'], partyType: ['customer','supplier'] },
+  ledger:    { type: ['in','out'] }
+};
+const SYNONYM = {
+  pending: 'new', open: 'new', received: 'new', enquiry: 'new',
+  confirmed: 'approved', accepted: 'approved', agreed: 'approved',
+  complete: 'done', completed: 'done', finished: 'done', delivered: 'done',
+  cancel: 'cancelled', canceled: 'cancelled',
+  paid: 'in', received_in: 'in', credit: 'in', debit: 'out', spent: 'out',
+  transit: 'sailing', shipping: 'sailing', customs: 'port',
+  live: 'published', posted: 'published'
+};
+
+function vet(coll, item) {
+  const spec = ENUMS[coll]; if (!spec) return item;
+  const out = { ...item };
+  for (const [field, allowed] of Object.entries(spec)) {
+    const raw = out[field];
+    if (raw === undefined || raw === null || raw === '') continue;
+    const v = String(raw).trim().toLowerCase().replace(/\s+/g, '_');
+    if (allowed.includes(v)) { out[field] = v; continue; }
+    const mapped = SYNONYM[v];
+    if (mapped && allowed.includes(mapped)) { out[field] = mapped; continue; }
+    throw new Error(
+      `invalid ${coll}.${field}: "${raw}". Allowed: ${allowed.join(', ')}.`);
+  }
+  return out;
+}
+
+/* ============================================================
    Records
    ============================================================ */
 export async function readAll() {
@@ -143,7 +185,7 @@ export async function upsert(coll, item) {
   if (!M[coll]) throw new Error('unknown-collection');
   if (!hasDb()) NO_DB();
   const m = M[coll];
-  const row = { ...m.to(item), ...(m.fixed || {}), deleted_at: null };
+  const row = { ...m.to(vet(coll, item)), ...(m.fixed || {}), deleted_at: null };
   const saved = (await rpc('upsert', { table: TABLE[coll], row })).row;
 
   if (m.lines && Array.isArray(item.lines) && saved && saved.id) {

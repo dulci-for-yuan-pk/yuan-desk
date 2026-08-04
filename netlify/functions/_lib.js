@@ -137,9 +137,25 @@ export async function callAgent(payload, { origin } = {}) {
     reply_to: {
       url: url0,
       token: mintReplyToken(6),
-      how: `POST ${url0} with header 'x-yuan-token: <token>' and body ` +
-           `{"kind":"reply","text":"<your Urdu reply>"}. Other kinds: note, browser, ` +
-           `task, approval, record. This token expires in 6 hours.`
+      how: [
+        `POST ${url0} with header 'x-yuan-token: <token>' (valid 6 hours).`,
+        `Reply to him:      {"kind":"reply","text":"<Urdu>","audio":"data:audio/wav;base64,..."}`,
+        `Quiet system line: {"kind":"note","text":"<Urdu>"}`,
+        `Hand over a login: {"kind":"browser","url":"...","instruction":"<Urdu>"}`,
+        `Show progress:     {"kind":"task","title_ur":"...","title_en":"...","status":"working","progress":40}`,
+        `Ask permission:    {"kind":"approval","approvalKind":"publish|post|submit|payment|message",` +
+          `"title_ur":"...","title_en":"...","detail_ur":"..."}`,
+        `Write to his books:{"kind":"record","collection":"orders","item":{...}}`,
+        `Log the job:       {"kind":"run","title":"...","status":"done","cost_usd":0.01}`,
+        `Book shapes — orders {id,no,date,customer,city,phone,item,qty,value,status,notes}; ` +
+          `customers {id,name,city,phone,notes}; invoices {id,no,date,customer,lines:[{item,qty,rate}]}; ` +
+          `payments {id,date,party,partyType,dir,amount,method,invoice}; ` +
+          `ledger {id,date,type,amount,category,note}. Money is plain rupee numbers; dates YYYY-MM-DD; ` +
+          `id is any string you choose (reuse it to update the same record). ` +
+          `orders.status must be new|quoted|approved|shipped|done|cancelled; ` +
+          `payments.dir and ledger.type are in|out. Close synonyms are accepted.`,
+        `NEVER use an audio URL that needs a login — send the bytes as a data URL or it will not play.`
+      ].join(' ')
     }
   };
 
